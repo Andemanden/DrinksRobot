@@ -4,18 +4,18 @@
 #include <AccelStepper.h>
 
 // Define stepper motor connections and motor interface type. Motor interface type must be set to 1 when using a driver:
-#define dirPin 2
-#define stepPin 3
+#define dirPin 11
+#define stepPin 12
 #define motorInterfaceType 1
-#define pumpePin1 4
+
 
 // Create a new instance of the AccelStepper class:
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 void setup() {
   // Set the maximum speed and acceleration:
-  stepper.setMaxSpeed(1000);
-  stepper.setAcceleration(500);
+  stepper.setMaxSpeed(9000);
+  stepper.setAcceleration(9000);
 }
 
 void loop() {
@@ -24,14 +24,23 @@ void loop() {
   //digitalWrite(2, LOW);
   // Set the target position:
   stepper.moveTo(12000);
+  
     //stepper.moveTo(50);
   // Run to target position with set speed and acceleration/deceleration:
   stepper.runToPosition();
-  delay(1000);
-
-  // Move back to zero:
-  stepper.moveTo(0);
+  stepper.moveTo(6000);
   stepper.runToPosition();
+  stepper.moveTo(1000);
+  stepper.runToPosition();
+  stepper.moveTo(12000);
+  // Move back to zero:
+  stepper.runToPosition();
+  stepper.moveTo(5000);
+  stepper.runToPosition();
+  stepper.moveTo(7000);
+  stepper.runToPosition();
+  stepper.moveTo(0);
+  
 
-  delay(1000);
+  
 }
