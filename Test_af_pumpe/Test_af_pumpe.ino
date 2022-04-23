@@ -1,13 +1,12 @@
 
-int vol=1;
 const int selPin=16, scrPin=17;
 int selOp=LOW, selKnap=LOW;
 
-void pump(int pumpe){
+void pump(int pumpe, int vol){
   Serial.print("Pumper: ");
   Serial.print(pumpe);
   digitalWrite(pumpe,HIGH);
-  delay(600); 
+  delay(600*vol); 
   digitalWrite(pumpe,LOW);
   delay(1000);
 }
@@ -32,11 +31,11 @@ void loop() {
   //pump(2);
   //pump(3);
   if (selOp==1023){ 
-    pump(4);
+    pump(4,1);
   }
   
   if (selKnap == 1023){
-   pump(5); 
+   pump(5,1); 
   }
   //pump(6);
   //pump(7);

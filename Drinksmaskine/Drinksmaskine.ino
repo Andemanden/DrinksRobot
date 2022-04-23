@@ -5,8 +5,8 @@
 #include <AccelStepper.h> // Inkludere AccelStepper biblioteket
 #define dirPin1 11 //Retnings pin
 #define stepPin1 12 //Stepper pin
-#define motorInterfaceType 1
-const int selPin=16, scrPin=17, hallPin=9; //Pins
+#define motorInterfaceType 1 //Moter pin mode til AccelStepper bibliotek
+const int selPin=16, scrPin=17, hallPin=9; //Definering af pins
 short int selOp=LOW, selKnap=LOW, op=0, hallState=0, fillAnim=3, fillAnimTom=3,
 glasPos=0, stepsTotal=12000, retning=LOW, stepsFlyt=0, lok=10;  //Variable
 String opskriftNavn[7]={"Gin & Tonic","Gin & Lemon","Lille Lyseroed",
@@ -14,7 +14,7 @@ String opskriftNavn[7]={"Gin & Tonic","Gin & Lemon","Lille Lyseroed",
 // Laver en ny AccelStepper klasse med biblioteket
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin1, dirPin1);
 rgb_lcd lcd;
-byte drinkGlasTom[] = { //LCD pixel data til animation
+byte drinkGlasTom[] = { //LCD pixel data til animation af drinkglas
   B10001,
   B10001,
   B10001,
@@ -39,7 +39,7 @@ void anim(){ /*---Animation---*/
    fillAnim=0;
    fillAnimTom=0;
    lcd.clear(); 
-   for (fillAnim=3; fillAnim>-1;fillAnim-=1){
+   for (fillAnim=3; fillAnim>-1;fillAnim-=1){ //Fylde animation
     drinkGlasTom[fillAnim]=B11111;
     lcd.createChar(0, drinkGlasTom);
     lcd.home();
@@ -47,7 +47,7 @@ void anim(){ /*---Animation---*/
     delay(700);
     lcd.clear(); 
    }
-   for (fillAnimTom=3; fillAnimTom>-1;fillAnimTom-=1){
+   for (fillAnimTom=3; fillAnimTom>-1;fillAnimTom-=1){ //Tømning ses ikke
     drinkGlasTom[fillAnimTom]=B10001;
    }
    lcd.createChar(0, drinkGlasTom);
@@ -57,9 +57,8 @@ void anim(){ /*---Animation---*/
 
 void pump(int vol, int pumpe){ /*---Ingrediens pumpning---*/
   digitalWrite(pumpe+2,HIGH);
-  delay(vol*600); //Volumen af ingrediensen
+  delay(vol*600); //Volumen af ingrediensen(600 sek = 1 cl)
   digitalWrite(pumpe+2,LOW);
-  
   Serial.print("Pumpe: ");
   Serial.print(pumpe+2);
   Serial.print("Vol: ");
@@ -91,12 +90,11 @@ void kal(){ /*---Kalibrering---*/
     delayMicroseconds(500);
     digitalWrite(stepPin1,LOW);
     delayMicroseconds(500);
-    hallState=digitalRead(hallPin);
-   
-    if (hallState == 1){
+    hallState=digitalRead(hallPin); 
+    if (hallState == 1){  //Passering af Hall Effect Sensor
       glasPos=0;
       hallState=0;
-      break; 
+      break; //Afbryder for-løkken
     }
   }
   for (int ing=0; ing<5600; ing++){ //Stepper motor loop
@@ -110,51 +108,48 @@ void kal(){ /*---Kalibrering---*/
 class Opskrift{ /*---Opskrift klassen---*/
     private: 
       int pumpelok[7]={7510,6110,4510,2950,1300,10,10610}; //Microstep lokalitet
+      //Indgredienser rækkefølge:
       //Vodka, Gin, Sprite, Lemon Soda, Tonic, Rød Soda, Appelsinjuice
-      //Opskrifter: Gin & Tonic, Gin & Lemon ,Lille Lyserød ,Filur ,Screwdriver
+      //Opskrifter rækkefølge: 
+      //Gin & Tonic, Gin & Lemon ,Lille Lyserød ,Filur ,Screwdriver
       //, Screwdriver & Gin, Vodka & Lemon
       int opskriftIng[7][7]={{0,2,0,0,13,0,0},{0,2,0,13,0,0,0},{0,2,7,0,0,6,0},
         {2,0,0,0,0,5,8},{5,0,0,0,0,0,10},{0,5,0,0,0,0,10},{2,0,0,13,0,0,0}};
     public:
     void lav(int op){ //Lav drinken
-      anim(); //Animere drink glas
+      anim(); //Animere drink glas på LCD
       for (int ing=0; ing<7; ing++){ 
         if (opskriftIng[op][ing]>0){
             Serial.print("Pumpelok: ");
             Serial.print(pumpelok[ing]);
-            //stepper.moveTo(pumpelok[ing]);
-            //stepper.runToPosition();
-
             steptil(pumpelok[ing],500);
-            
-            delay(2000);
+            delay(1000);
             lcd.clear();
             lcd.print("Laver din drink");
-            //kal(pumpelok[ing]); //Kalibrer mens steppermoteren kører
+            //kal(pumpelok[ing]); //Kan kalibrer efter hver ingrediens
             pump(opskriftIng[op][ing],ing); //Pumper ingrediens
             lcd.clear(); 
-            
-            delay(5000);
+            delay(5000); //Venter på afdrypning
         }
       }
+      //Ryste rutinen
       lcd.clear(); 
       lcd.print("    Rystet?");
       lcd.setCursor(0,1);
       lcd.print("Nej           Ja");
-      for (int vent=0; vent<200000; vent++){ 
+      for (int vent=0; vent<200000; vent++){ //Venter på input
         selKnap=analogRead(selPin); //Vælge Knap pin
         selOp=analogRead(scrPin); //Scroller Knap pin
-        if (selKnap == 1023){
-          ryst(60,30);
+        if (selKnap == 1023){ //Ja knappen
+          ryst(60,30); //Ryster
           break;
-        } else if (selOp==1023){
+        } else if (selOp==1023){ //Nej knappen
           break;
         }  
         delay(20);
       }
       lcd.clear();
-      kal();
-      
+      kal(); //Kalibrering
       Serial.print("FÆRDIG");
       Serial.print(glasPos);
       lcd.clear(); 
@@ -168,29 +163,9 @@ class Opskrift{ /*---Opskrift klassen---*/
 void steptil(int pos, int delayet){/*---Stepper bevægelse---*/
   stepsFlyt=abs(pos-glasPos); //Finder step antallet
   if (pos-glasPos<0){
-    stepsFlyt=((12000-glasPos)+pos);
+    stepsFlyt=((stepsTotal-glasPos)+pos);
   } 
-  /*if (pos-glasPos>0){//Finder retningen
-     if(((12000-pos)+glasPos)>(pos-glasPos)){
-      retning=HIGH;
-      stepsFlyt=(pos-glasPos);
-     } else {
-      retning=LOW;
-      stepsFlyt=((12000+pos)+glasPos);
-     }
-    //retning=LOW;//Mod uret
-  } else if (pos-glasPos<0){
-     if (((12000-glasPos)+pos)>(glasPos-pos)){
-      retning=HIGH;
-      stepsFlyt=(glasPos-pos);
-     } else {
-      retning=LOW;
-      stepsFlyt=((12000-glasPos)+pos);
-     }
-    //retning=HIGH; //Med uret
-  }*/
-  retning=HIGH; //Med uret
-  //Serial.print(retning);
+  retning=HIGH; //Altid med uret for kalibrering
   digitalWrite(dirPin1, retning); //Vælger retningen
   for (int steps=0; steps<stepsFlyt; steps++){ //Stepper motor loop
     digitalWrite(stepPin1,HIGH);
@@ -199,83 +174,53 @@ void steptil(int pos, int delayet){/*---Stepper bevægelse---*/
     delayMicroseconds(delayet);
     //Serial.print(glasPos);
     if (retning==HIGH){ //Opdatere position
-      glasPos+=1; //Forlæns
+      glasPos+=1; //Med uret
     } else {
-    glasPos-=1; //Baglæns
+    glasPos-=1; //Mod uret
     }
     if (hallState == 1){
       glasPos=0; 
       hallState=0;
     }
   }
-  //Serial.print(stepsFlyt);
-  //Serial.print(glasPos);
-  /*if (retning==HIGH){ //Opdatere position
-    glasPos+=stepsFlyt; //Forlæns
-    Serial.print("HIGH");
-  } else if(retning==LOW){
-    glasPos-=stepsFlyt; //Baglæns
-  }*/
-  //Serial.print(glasPos);
-  if (glasPos>stepsTotal){ //Omdanner omgang til position
+  //Omdanner omgang til position
+  if (glasPos>stepsTotal){ //Steppet over 0 med uret
     glasPos-=stepsTotal;
-  } else if (glasPos<0){
+  } else if (glasPos<0){ //Steppet over 0 mod uret
     glasPos=stepsTotal-abs(glasPos);
   }
-  /*if (glasPos<0){
-    glasPos=stepsTotal-abs(glasPos);
-  }*/
-  stepsFlyt=0; //Til at der kan ses om moteren kører
+  stepsFlyt=0; //Nulstiller steps flyt
 };
 
 void setup(){ /*---Køres en gang---*/
   Serial.begin(9600); //Opsætter bitrate aftalen
-  pinMode(scrPin, INPUT);
-  pinMode(selPin, INPUT);
-  
-  pinMode(hallPin, INPUT);
+  pinMode(scrPin, INPUT); //Skifte pin
+  pinMode(selPin, INPUT); //Vælge pin
+  pinMode(hallPin, INPUT); //Hall Effect Sensorens pin
   for (int p=2; p<9; p++){
     pinMode(p, OUTPUT); //Pumpernes pins
   }
-  //Angiver den maksimale hastighed og acceleration:
-  stepper.setMaxSpeed(10000); //Kom ikke over 1500
-  stepper.setAcceleration(1400); //Kom ikke over 600
-  //stepper.moveTo(0);
-  //stepper.runToPosition();
-  //kal(0);
-  //LCD start besked
+  //Angiver den maksimale hastighed og acceleration til library
+  stepper.setMaxSpeed(10000); 
+  stepper.setAcceleration(1400); 
+  //LCD start konfiguration
   lcd.begin(16, 2);
-  lcd.createChar(1, bogstav);
-  lcd.createChar(0, drinkGlasTom);
+  lcd.createChar(1, bogstav); //Laver bogstavet æ 
+  lcd.createChar(0, drinkGlasTom); //Laver tomt drinkglas
   lcd.home(); 
+  //LCD start beskeden
   lcd.print(" Drinksmaskine");
   delay(500);
   lcd.setCursor(0,1);
   lcd.print(" Robotteknologi");
   delay(500);
   lcd.clear();
-  //stepper.move(200000);
-  //stepper.runToPosition();
-  //kali(current);
- 
-  /*if (hallState == HIGH){
-    stepper.stop();
-  }*/
   lcd.print("  Kalibrering");
   lcd.setCursor(0,1);
   lcd.print("     Igang");
-  //stepper.setMaxSpeed(10000);
-  //stepper.setAcceleration(10000);
-  /*for (int steps=0; steps<20000; steps++){
-    stepper.move(60);
-    stepper.runToPosition();
-    kal(steps);
-  }*/
-  //-(129*stepsFlyt/stepsTotal)
-  kal();
-  glasPos=5600;
+  kal();  //Kalibrere steppermoteren
   Serial.print(glasPos);
-  steptil(5600,500);
+  steptil(5600,500);  //Så vi er sikre på positionen
   lcd.clear();
   lcd.print("F");
   lcd.write(byte(1)); //Skriver æ
@@ -284,14 +229,14 @@ void setup(){ /*---Køres en gang---*/
 }
 
 void loop(){ /*---Løkken---*/
-  selKnap=analogRead(selPin); //Vælge Knap pin
-  selOp=analogRead(scrPin); //Scroller Knap pin
+  selKnap=analogRead(selPin); //Vælge Knap
+  selOp=analogRead(scrPin); //Skifte Knap
   //Menuen på skærmen
   lcd.clear(); 
   lcd.print("V");
-  lcd.write(byte(1));
+  lcd.write(byte(1)); //Skriver æ 
   lcd.print("lg Drink: ");
-  lcd.write(byte(0));
+  lcd.write(byte(0)); //Tegner drinksglas
   lcd.setCursor(0,1);
   lcd.print(">");
   lcd.print(opskriftNavn[op]);
@@ -302,15 +247,15 @@ void loop(){ /*---Løkken---*/
     lcd.print("Laver Drink ");
     lcd.setCursor(0,1);
     lcd.print(opskriftNavn[op]);
-    Opskrift Opskriften;
-    Opskriften.lav(op);
+    delay(1000);
+    Opskrift Opskriften;  //Objekt laves ud fra klassen
+    Opskriften.lav(op); //Objektets metode køres
   }
-  //Scroller knappen
-  if (selOp==1023){ //
+  //Skifte knappen
+  if (selOp==1023){ 
     Serial.print("SelOp");
     if (op>5){op=0;} else {
-    op++;}
+    op++;} //Skifter til næste opskrift
   }
-
-  delay(200); //Nødvendig til display
+  delay(200); //Nødvendig for display
 }
