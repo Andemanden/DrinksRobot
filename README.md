@@ -1,7 +1,7 @@
 # DrinksRobot ![intro][intro-image] ![lecture][lecture-image] 
 A drink making machine.
 This machine has been made in gymnasium by me and my studygroup
-
+![Render](Renderinger/Alkohol_KaruselGoodrendering.png)
 ## General concept
 A robot for the automated production of drinks.
 
