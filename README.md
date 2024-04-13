@@ -1,7 +1,5 @@
-# DrinksRobot ![intro][intro-image]
+# DrinksRobot ![intro][intro-image] ![lecture][lecture-image] 
 A drink making machine
-
-[into-image]: https://img.shields.io/badge/LNG-C++-orange
 
 ## General concept
 A robot for the automated production of drinks.
@@ -14,3 +12,5 @@ A robot for the automated production of drinks.
 A technical drawing of the final robot:
 ![Teknisktegning](Teknisktegning.png)
 
+[intro-image]: https://img.shields.io/badge/LNG-C++-orange
+[lecture-image]: https://img.shields.io/badge/Lecture-Robot_Tech-Blue
