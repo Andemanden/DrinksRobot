@@ -26,8 +26,9 @@ A technical drawing of the final robot:
 ![Teknisktegning](Teknisktegning.png)
 
 ## Strength calculations
-Numerous calculations have been made for the insurance of overall structural strength
+Numerous calculations have been made for the insurance of overall structural strength:
 
+![Strength](Renderinger/StrengthCalc.png )
 
 
 
