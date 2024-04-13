@@ -14,4 +14,4 @@ A technical drawing of the final robot:
 ![Teknisktegning](Teknisktegning.png)
 
 [intro-image]: https://img.shields.io/badge/LNG-C++-orange
-[lecture-image]: https://img.shields.io/badge/Lecture-Robot_Tech-Blue
+[lecture-image]: https://img.shields.io/badge/Lecture-Robot_Tech_A-Blue
