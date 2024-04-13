@@ -28,7 +28,7 @@ A technical drawing of the final robot:
 ## Strength calculations
 Numerous calculations have been made for the insurance of overall structural strength:
 
-![Strength](https://github.com/Andemanden/DrinksRobot/blob/a7391cd753ef7a3dd8dcc2f2925d3e1538929d36/Renderinger/StrengthCalc.png)
+![Strength](Renderinger/StrengthCalc.png)
 
 
 
