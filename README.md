@@ -1,4 +1,4 @@
-# DrinksRobot ![intro][intro-image] ![lecture][lecture-image] 
+# DrinksRobot ![intro][intro-image] ![lecture][lecture-image] ![year][year-image] 
 A drink making machine.
 This machine has been made in gymnasium by me and my studygroup
 ![Render](Renderinger/Alkohol_KaruselGoodrendering.png)
@@ -31,6 +31,10 @@ Numerous calculations have been made for the insurance of overall structural str
 ![Strength](Renderinger/StrengthCalc.png)
 
 
+This machine was made in 2022.
+
 
 [intro-image]: https://img.shields.io/badge/LNG-C++-orange
 [lecture-image]: https://img.shields.io/badge/Lecture-Robot_Tech_A-Blue
+[year-image]: https://img.shields.io/badge/Year-2022-brown
+
